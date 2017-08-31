@@ -1,0 +1,34 @@
+
+
+
+
+
+
+
+ssh-keygen
+ssh-copy-id webserver
+ssh webserver
+
+
+ls -lha etc/ansible
+
+cp -R /etc/ansible myplatform
+
+cd myplatform/
+
+ls -lha
+
+
+vi ansible.cfg // => inventory =hosts
+vi hosts   // => appserver dbserver webserver
+
+ansible -m ping all
+
+shell commands = adhoc commands
+
+ansible -m shell -a 'hostname' all
+ansible -m shell -a 'df-h' all
+ansible -m shell -a 
+
+
+
