@@ -26,9 +26,20 @@ ansible -i hosts -u root -m ping all
 
 
 ls /vagrant
-cp /vagrant/ansible-demo/abc.yml .
+cp /vagrant/ansible-demo/nginx.yml .
 cp -r /vagrant/ansible-demo/templates/ .
 
-cat abc.yml
+cat nginx.yml
+cat templates/nginx.conf.j2
+
+ansible-playbook -i hosts -u root nginx.yml
+
+// check new generation engine running o not
+
+curl http://192.168.0.2
+
+
+
+
 
 
