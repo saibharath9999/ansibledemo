@@ -2,18 +2,11 @@
 Installation
 ------------------------------------------------------------------------------------------------------------------------
 ssh-keygen
-
 Ansible machine
-
 cat .ssh/id_rsa.pub
-
-
 webserver machine
-
 echo 'ssh-rsa paste_the_key' > /root/.ssh/authorized_keys
-
 //if denied to enter key -> sudo -s
-
 // go back to ansible machine
 vi hosts => add ip address => 192.168.0.2
 
@@ -21,8 +14,79 @@ ssh-agent bash
 ssh-add .ssh/id_rsa // add the private key
 
 ansible -i hosts -u root -m ping all
+------------------------------------------------------------------------------------------------------------------
+Move to ansible folder
+
+ls -lha /etc/ansible
+cp -R /etc/ansible myplatform
+
+cd myplatform 
+ls -lha
+
+----------------------------------------------------------------
+Creating configuration 
+
+vi ansible.cfg
+inventory =hosts
+
+vi hosts
+ip address of all server or hostname
+  dbserver
+  appserver
+  webserver
+  
+  ansible -m ping all
+  ansible -m shell -a 'hostname' all
+  ansible -m shell -a 'df-h' all
+  ansible -m shell -a 'whoami' all
+  ansible -b -K -m user -a 'name=testuser' all
+  getnet passwd |grep testuser
+  ansible -m shell -a 'getent passwd | grep testuser' all
+  
+ --------------------------------------------------------------------------------------
+Creating Main.YML file
+
+mkdir roles
+mkdir roles/basic
+mkdir roles/basic/tasks
+cd roles/basic/tasks
+
+vi main.yml
+
+In Main.Yml file =>  
+
+name: "Installing Vim"
+apt: pkg=vim state =installed
+
 
 ------------------------------------------------------------------------------------------------------------------------
+Go to myplatform directory or home directory
+Create a playbook.yml
+
+
+vi playbook.yml
+
+IN playbook.yml file =>
+
+hosts: all
+become: true
+roles: 
+  -basic
+  
+  
+Run playbook.yml
+  
+  ansible playbook -K playbook.yml
+
+------------------------------------------------------------------------------------------------------------------------
+
+vi roles/basic/tasks/main.yml
+
+
+
+
+
+
 
 
 ls /vagrant
