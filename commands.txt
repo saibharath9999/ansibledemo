@@ -1,5 +1,7 @@
 
 Installation
+
+sudo apt-add-repository -y ppa:ansible/ansible
 ------------------------------------------------------------------------------------------------------------------------
 ssh-keygen
 Ansible machine
