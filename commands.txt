@@ -1,22 +1,53 @@
 
 Installation
+----------------------------------------------------------------------------------------------------------------------------
+Vagrant File -Installation
+----------------------------------------------------------------------------------------------------------------------------
+Vagrant.configure("2") do |config|
+  config.vm.define "webserver" do |webserver|
+    webserver.vm.box = "ubuntu/trusty64"
+    webserver.vm.network "private_network", ip: "192.168.0.91"
+    webserver.vm.hostname = "webserver"
+  end
+  config.vm.define "ansible" do |ansible|
+    ansible.vm.box = "ubuntu/trusty64"
+    ansible.vm.network "private_network", ip: "192.168.0.92"
+    ansible.vm.hostname = "ansible"
+  end
+end
+-----------------------------------------------------------------------------------------------------------------------
 
-sudo apt-add-repository -y ppa:ansible/ansible
+Ansibe Installation for ubuntu
+
+ sudo apt-get update
+ sudo apt-get install software-properties-common
+ sudo apt-add-repository ppa:ansible/ansible
+ sudo apt-get update
+ sudo apt-get install ansible
 ------------------------------------------------------------------------------------------------------------------------
+In ansible machine
+
 ssh-keygen
-Ansible machine
 cat .ssh/id_rsa.pub
-webserver machine
+
+
+In webserver machine
+
 echo 'ssh-rsa paste_the_key' > /root/.ssh/authorized_keys
 //if denied to enter key -> sudo -s
 // go back to ansible machine
+
 vi hosts => add ip address => 192.168.0.2
 
 ssh-agent bash
 ssh-add .ssh/id_rsa // add the private key
 
 ansible -i hosts -u root -m ping all
-------------------------------------------------------------------------------------------------------------------
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
 Move to ansible folder
 
 ls -lha /etc/ansible
@@ -25,25 +56,24 @@ cp -R /etc/ansible myplatform
 cd myplatform 
 ls -lha
 
-------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------------------
+
+
 Creating configuration 
 
 vi ansible.cfg
-inventory =hosts
+inventory = hosts
 
 vi hosts
-ip address of all server or hostname
-  dbserver
-  appserver
-  webserver
+ipaddress of all hosts
   
-  ansible -m ping all
-  ansible -m shell -a 'hostname' all
-  ansible -m shell -a 'df-h' all
-  ansible -m shell -a 'whoami' all
-  ansible -b -K -m user -a 'name=testuser' all
-  getnet passwd |grep testuser
-  ansible -m shell -a 'getent passwd | grep testuser' all
+  ansible -u root -m ping all
+  ansible -u root -m shell -a 'hostname' all
+  ansible -u root -m shell -a 'df-h' all
+  ansible -u root -m shell -a 'whoami' all
+
   
  --------------------------------------------------------------------------------------
 Creating Main.YML file
@@ -52,34 +82,38 @@ mkdir roles
 mkdir roles/basic
 mkdir roles/basic/tasks
 cd roles/basic/tasks
-
 vi main.yml
 
 In Main.Yml file =>  
 
-name: "Installing Vim"
-apt: pkg=vim state =installed
+- name: "Installing Vim"
+  apt: pkg=vim state=installed
 
 
 
 ------------------------------------------------------------------------------------------------------------------------
-Go to myplatform directory or home directory
+// Go to myplatform directory or home directory
 Create a playbook.yml
-
+// it need to be created in myplatform directory
 
 vi playbook.yml
 
 IN playbook.yml file =>
 
-hosts: all
-become: true
-roles: 
-  - basic
+---
+- hosts: all
+  become: true
+  roles: 
+   - basic
   
   
 Run playbook.yml
   
-  ansible playbook -K playbook.yml
+  ansible-playbook -u root -s playbook.yml
+  
+  // if you need to run along with sudo password
+  
+  ansible-playbook -u root -s playbook.yml
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -87,43 +121,32 @@ Multipe installaiton configuration
 
 vi roles/basic/tasks/main.yml
 
-name: "Installing Vim"
-apt: pkg=vim state =installed
+- name: "Installing Vim"
+  apt: pkg=vim state=installed
 
-name: "Installing DNS Utils"
-apt: pkg=dnsutils state =installed
+- name: "Installing DNS Utils"
+  apt: pkg=dnsutils state=installed
 
-name: "Installing Vim"
-apt: pkg=git state =installed
+- name: "Installing Vim"
+  apt: pkg=git state=installed
 
   Run => ansible playbook -K playbook.yml
   
   (or)
 
-name: "Installing additional software"
-apt: pkg={{item}} state =installed
-with items:
-  - dnsutils
-  - git
-  - vim
-  - ntp
-  - at
-  - lvm2
+- name: "Installing additional software"
+  apt: pkg={{item}} state=installed
+  with_items:
+   - dnsutils
+   - git
+   - vim
+   - ntp
+   - at
+   - lvm2
 
 ------------------------------------------------------------------------------------------------------------------------
 
-ls /vagrant
-cp /vagrant/ansible-demo/nginx.yml .
-cp -r /vagrant/ansible-demo/templates/ .
 
-cat nginx.yml
-cat templates/nginx.conf.j2
-
-ansible-playbook -i hosts -u root nginx.yml
-
-// check new generation engine running o not
-
-curl http://192.168.0.2
 
 
 
