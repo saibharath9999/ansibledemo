@@ -25,17 +25,17 @@ Ansibe Installation for ubuntu
  sudo apt-get update
  sudo apt-get install ansible
 ------------------------------------------------------------------------------------------------------------------------
-In ansible machine
+In server machine
 
 ssh-keygen
 cat .ssh/id_rsa.pub
 
 
-In webserver machine
+In host machine
 
 echo 'ssh-rsa paste_the_key' > /root/.ssh/authorized_keys
 //if denied to enter key -> sudo -s
-// go back to ansible machine
+// go back to server machine
 
 vi hosts => add ip address => 192.168.0.2
 
@@ -105,7 +105,23 @@ IN playbook.yml file =>
   become: true
   roles: 
    - basic
-  
+   
+=================================================================================
+---
+- hosts: droplets
+  tasks:
+    - name: Installs nginx web server
+      apt: pkg=nginx state=installed update_cache=true
+      notify:
+        - start nginx
+
+    - name: Upload default index.html for host
+      copy: src=static_files/index.html dest=/usr/share/nginx/www/ mode=0644
+
+  handlers:
+    - name: start nginx
+      service: name=nginx state=started
+ ================================================================================== 
   
 Run playbook.yml
   
